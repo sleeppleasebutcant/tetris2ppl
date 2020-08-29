@@ -44,6 +44,32 @@ class TetrisWorld {
                     2: { x: 0, y: 0 },
                     3: { x: 0, y: 0 },
                 }
+            },
+            left_l: {
+                first: {
+                    0: { x: 0, y: 0 },
+                    1: { x: 0, y: 0 },
+                    2: { x: 0, y: -2 },
+                    3: { x: -2, y: -2 },
+                },
+                second: {
+                    0: { x: 2, y: 0 },
+                    1: { x: 2, y: -2 },
+                    2: { x: 0, y: 0 },
+                    3: { x: 0, y: 0 },
+                },
+                third: {
+                    0: { x: 0, y: 0 },
+                    1: { x: 0, y: 0 },
+                    2: { x: 1, y: 2 },
+                    3: { x: 1, y: 2 },
+                },
+                forth: {
+                    0: { x: -2, y: 0 },
+                    1: { x: -2, y: 2 },
+                    2: { x: -1, y: 0 },
+                    3: { x: +1, y: 0 },
+                }
             }
         };
 
@@ -78,7 +104,7 @@ class TetrisWorld {
         var shapes = ["square", "t_shaped", "snake", "left_snake", "line", "left_L", "right_L", ];
 
         //var random_shape = shapes[Math.floor(Math.random() * shapes.length)];
-        var random_shape = "left_L";
+        var random_shape = "right_L";
 
 
         if (random_shape == 'square') {
@@ -323,6 +349,62 @@ class TetrisWorld {
             block.rotation = 0;
         }
     }
+
+    rotate_left_l(block) {
+        if (block.rotation == 0) {
+            for (var i = 0; i < block.list.length; i++) {
+                var rotation_vec = this.rotation_vectors.left_l.first[i];
+
+                this.logical_map[block.list[i].y][block.list[i].x].color = "white";
+                this.logical_map[block.list[i].y][block.list[i].x].state = "blank";
+
+                block.list[i].x += rotation_vec.x;
+                block.list[i].y += rotation_vec.y;
+            }
+            block.rotation = 1;
+
+        } else if (block.rotation == 1) {
+            for (var i = 0; i < block.list.length; i++) {
+
+                var rotation_vec = this.rotation_vectors.left_l.second[i];
+
+                this.logical_map[block.list[i].y][block.list[i].x].color = "white";
+                this.logical_map[block.list[i].y][block.list[i].x].state = "blank";
+
+                block.list[i].x += rotation_vec.x;
+                block.list[i].y += rotation_vec.y;
+
+            }
+            block.rotation = 2;
+        } else if (block.rotation == 2) {
+            for (var i = 0; i < block.list.length; i++) {
+
+                var rotation_vec = this.rotation_vectors.left_l.third[i];
+
+                this.logical_map[block.list[i].y][block.list[i].x].color = "white";
+                this.logical_map[block.list[i].y][block.list[i].x].state = "blank";
+
+                block.list[i].x += rotation_vec.x;
+                block.list[i].y += rotation_vec.y;
+
+            }
+            block.rotation = 3;
+        } else if (block.rotation == 3) {
+            for (var i = 0; i < block.list.length; i++) {
+
+                var rotation_vec = this.rotation_vectors.left_l.forth[i];
+
+                this.logical_map[block.list[i].y][block.list[i].x].color = "white";
+                this.logical_map[block.list[i].y][block.list[i].x].state = "blank";
+
+                block.list[i].x += rotation_vec.x;
+                block.list[i].y += rotation_vec.y;
+
+            }
+            block.rotation = 0;
+        }
+    }
+
     rotate_t_shaped(block) {
         console.log(block);
         if (block.rotation == 0) {
@@ -363,7 +445,7 @@ class TetrisWorld {
                 block.list[i].y += rotation_vec.y;
 
             }
-            block.rotation = 3;
+            block.rotation = 0;
         } else if (block.rotation == 3) {
             for (var i = 0; i < block.list.length; i++) {
 
@@ -393,6 +475,7 @@ class TetrisWorld {
         console.log("rotate");
         if (block.name == "line") this.rotate_line(block);
         if (block.name == "t_shaped") this.rotate_t_shaped(block);
+        if (block.name == "left_L") this.rotate_left_l(block);
     }
 
 }
