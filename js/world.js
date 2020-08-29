@@ -19,9 +19,30 @@ class TetrisWorld {
                 },
 
             },
-            left_l: {
-                0: {
-                    0: { "x": 1, "y": 0 }
+            t_shaped: {
+                first: {
+                    0: { x: 1, y: 1 },
+                    1: { x: 1, y: (-1) },
+                    2: { x: 0, y: 0 },
+                    3: { x: (-1), y: 1 },
+                },
+                second: {
+                    0: { x: -1, y: 1 },
+                    1: { x: 1, y: 1 },
+                    2: { x: 0, y: 0 },
+                    3: { x: -1, y: -1 },
+                },
+                third: {
+                    0: { x: 0, y: 0 },
+                    1: { x: -1, y: -1 },
+                    2: { x: 0, y: 0 },
+                    3: { x: 0, y: 0 },
+                },
+                forth: {
+                    0: { x: 1, y: -1 },
+                    1: { x: 0, y: 0 },
+                    2: { x: 0, y: 0 },
+                    3: { x: 0, y: 0 },
                 }
             }
         };
@@ -57,7 +78,7 @@ class TetrisWorld {
         var shapes = ["square", "t_shaped", "snake", "left_snake", "line", "left_L", "right_L", ];
 
         //var random_shape = shapes[Math.floor(Math.random() * shapes.length)];
-        var random_shape = "line";
+        var random_shape = "left_L";
 
 
         if (random_shape == 'square') {
@@ -72,8 +93,8 @@ class TetrisWorld {
         } else if (random_shape == "t_shaped") {
 
             var partblock_1 = { color: random_color, state: "moving down", x: 5, y: 0 };
-            var partblock_3 = { color: random_color, state: "moving down", x: 4, y: 1 };
-            var partblock_2 = { color: random_color, state: "moving down", x: 5, y: 1 };
+            var partblock_2 = { color: random_color, state: "moving down", x: 4, y: 1 };
+            var partblock_3 = { color: random_color, state: "moving down", x: 5, y: 1 };
             var partblock_4 = { color: random_color, state: "moving down", x: 6, y: 1 };
             var object_whole = { rotation: 0, name: "t_shaped", list: [partblock_1, partblock_2, partblock_3, partblock_4] };
 
@@ -233,11 +254,9 @@ class TetrisWorld {
         if (KEYS["ArrowLeft"]) {
             this.move_left();
         }
-        console.log(Date.now() - this.time_of_last_rotate);
         if (KEYS["KeyR"] && Date.now() - this.time_of_last_rotate > 150) {
             this.time_of_last_rotate = Date.now();
             this.rotate(falling_object_whole);
-            draw(this);
         }
 
 
@@ -272,40 +291,108 @@ class TetrisWorld {
             this.new_falling_block();
         }
     }
+
+    rotate_line(block) {
+        console.log("rotate line");
+        console.log(block);
+        if (block.rotation == 0) {
+            for (var i = 0; i < block.list.length; i++) {
+
+                var rotation_vec = this.rotation_vectors.line.first[i];
+
+                this.logical_map[block.list[i].y][block.list[i].x].color = "white";
+                this.logical_map[block.list[i].y][block.list[i].x].state = "blank";
+
+                block.list[i].x += rotation_vec.x;
+                block.list[i].y += rotation_vec.y;
+
+            }
+            block.rotation = 1;
+        } else if (block.rotation == 1) {
+            for (var i = 0; i < block.list.length; i++) {
+
+                var rotation_vec = this.rotation_vectors.line.first[i];
+
+                this.logical_map[block.list[i].y][block.list[i].x].color = "white";
+                this.logical_map[block.list[i].y][block.list[i].x].state = "blank";
+
+                block.list[i].x += -rotation_vec.x;
+                block.list[i].y += -rotation_vec.y;
+
+            }
+            block.rotation = 0;
+        }
+    }
+    rotate_t_shaped(block) {
+        console.log(block);
+        if (block.rotation == 0) {
+            for (var i = 0; i < block.list.length; i++) {
+
+                var rotation_vec = this.rotation_vectors.t_shaped.first[i];
+
+                this.logical_map[block.list[i].y][block.list[i].x].color = "white";
+                this.logical_map[block.list[i].y][block.list[i].x].state = "blank";
+
+                block.list[i].x += rotation_vec.x;
+                block.list[i].y += rotation_vec.y;
+
+            }
+            block.rotation = 1;
+        } else if (block.rotation == 1) {
+            for (var i = 0; i < block.list.length; i++) {
+
+                var rotation_vec = this.rotation_vectors.t_shaped.second[i];
+
+                this.logical_map[block.list[i].y][block.list[i].x].color = "white";
+                this.logical_map[block.list[i].y][block.list[i].x].state = "blank";
+
+                block.list[i].x += rotation_vec.x;
+                block.list[i].y += rotation_vec.y;
+
+            }
+            block.rotation = 2;
+        } else if (block.rotation == 2) {
+            for (var i = 0; i < block.list.length; i++) {
+
+                var rotation_vec = this.rotation_vectors.t_shaped.third[i];
+
+                this.logical_map[block.list[i].y][block.list[i].x].color = "white";
+                this.logical_map[block.list[i].y][block.list[i].x].state = "blank";
+
+                block.list[i].x += rotation_vec.x;
+                block.list[i].y += rotation_vec.y;
+
+            }
+            block.rotation = 3;
+        } else if (block.rotation == 3) {
+            for (var i = 0; i < block.list.length; i++) {
+
+                var rotation_vec = this.rotation_vectors.t_shaped.forth[i];
+
+                this.logical_map[block.list[i].y][block.list[i].x].color = "white";
+                this.logical_map[block.list[i].y][block.list[i].x].state = "blank";
+
+                block.list[i].x += rotation_vec.x;
+                block.list[i].y += rotation_vec.y;
+
+            }
+            //restore to orginal order
+            var p0 = block.list[0];
+            var p1 = block.list[1];
+            var p2 = block.list[2];
+            var p3 = block.list[3];
+
+            block.list = [p1, p3, p2, p0];
+
+            block.rotation = 0;
+        }
+        console.log(block);
+    }
+
     rotate(block) {
         console.log("rotate");
-        if (block.name == "line") {
-            console.log("rotate line");
-            console.log(block);
-            if (block.rotation == 0) {
-                for (var i = 0; i < block.list.length; i++) {
-
-                    var rotation_vec = this.rotation_vectors.line.first[i];
-
-                    this.logical_map[block.list[i].y][block.list[i].x].color = "white";
-                    this.logical_map[block.list[i].y][block.list[i].x].state = "blank";
-
-                    block.list[i].x += rotation_vec.x;
-                    block.list[i].y += rotation_vec.y;
-
-                }
-                block.rotation = 1;
-            } else if (block.rotation = 1) {
-                for (var i = 0; i < block.list.length; i++) {
-
-                    var rotation_vec = this.rotation_vectors.line.first[i];
-
-                    this.logical_map[block.list[i].y][block.list[i].x].color = "white";
-                    this.logical_map[block.list[i].y][block.list[i].x].state = "blank";
-
-                    block.list[i].x += -rotation_vec.x;
-                    block.list[i].y += -rotation_vec.y;
-
-                }
-                block.rotation = 0;
-            }
-
-        }
+        if (block.name == "line") this.rotate_line(block);
+        if (block.name == "t_shaped") this.rotate_t_shaped(block);
     }
 
 }
