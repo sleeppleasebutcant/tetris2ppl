@@ -8,6 +8,7 @@ class TetrisWorld {
         this.last_tick = Date.now();
         this.game_speed = 400;
         this.time_of_last_rotate = Date.now();
+        this.score = 0;
 
         this.rotation_vectors = {
             line: {
@@ -70,6 +71,48 @@ class TetrisWorld {
                     2: { x: -1, y: 0 },
                     3: { x: +1, y: 0 },
                 }
+            },
+            right_l: {
+                first: {
+                    0: { x: 0, y: 0 },
+                    1: { x: 0, y: 0 },
+                    2: { x: 1, y: 1 },
+                    3: { x: 3, y: 1 },
+                },
+                second: {
+                    0: { x: 2, y: 2 },
+                    1: { x: 0, y: 2 },
+                    2: { x: 0, y: 0 },
+                    3: { x: 0, y: 0 },
+                },
+                third: {
+                    0: { x: -3, y: -1 },
+                    1: { x: 0, y: 0 },
+                    2: { x: 0, y: 0 },
+                    3: { x: -1, y: -1 },
+                },
+                forth: {
+                    0: { x: 0, y: 0 },
+                    1: { x: -1, y: -1 },
+                    2: { x: -2, y: 0 },
+                    3: { x: -3, y: 1 },
+                }
+            },
+            snake: {
+                first: {
+                    0: { x: 0, y: 2 },
+                    1: { x: 0, y: 0 },
+                    2: { x: 0, y: 0 },
+                    3: { x: 2, y: 0 },
+                }
+            },
+            left_snake: {
+                first: {
+                    0: { x: 2, y: 0 },
+                    1: { x: 0, y: 0 },
+                    2: { x: 0, y: 0 },
+                    3: { x: 0, y: -2 },
+                }
             }
         };
 
@@ -103,12 +146,12 @@ class TetrisWorld {
         var random_color = colors[Math.floor(Math.random() * colors.length)];
         var shapes = ["square", "t_shaped", "snake", "left_snake", "line", "left_L", "right_L", ];
 
-        //var random_shape = shapes[Math.floor(Math.random() * shapes.length)];
-        var random_shape = "right_L";
+        var random_shape = shapes[Math.floor(Math.random() * shapes.length)];
+        random_shape = "left_snake";
 
 
         if (random_shape == 'square') {
-            var partblock_1 = { color: random_color, state: "moving down", x: 5, y: 0, };
+            var partblock_1 = { color: random_color, state: "moving down", x: 5, y: 0 };
             var partblock_2 = { color: random_color, state: "moving down", x: 6, y: 0 };
             var partblock_3 = { color: random_color, state: "moving down", x: 5, y: 1 };
             var partblock_4 = { color: random_color, state: "moving down", x: 6, y: 1 };
@@ -169,7 +212,7 @@ class TetrisWorld {
             var partblock_2 = { color: random_color, state: "moving down", x: 6, y: 0 };
             var partblock_3 = { color: random_color, state: "moving down", x: 6, y: 1 };
             var partblock_4 = { color: random_color, state: "moving down", x: 7, y: 1 };
-            var object_whole = { rotation: 0, shape: "left_snake", list: [partblock_1, partblock_2, partblock_3, partblock_4] };
+            var object_whole = { rotation: 0, name: "left_snake", list: [partblock_1, partblock_2, partblock_3, partblock_4] };
             this.falling_objects.push(object_whole);
             this.place_block_onto_map(object_whole.list);
         }
@@ -293,7 +336,7 @@ class TetrisWorld {
             console.log("space");
             this.game_speed = 50;
         } else {
-            this.game_speed = 150;
+            this.game_speed = 200;
         }
 
         if (Date.now() - this.last_tick < this.game_speed) {
@@ -350,10 +393,32 @@ class TetrisWorld {
         }
     }
 
+    can_rotate_block(block, vec) {
+        for (var i = 0; i < block.list.length; i++) {
+            var to_be_x = block.list[i].x + vec[i].x;
+            var to_be_y = block.list[i].y + vec[i].y;
+            if (to_be_x < 0 || to_be_x >= this.width || to_be_y < 0 || to_be_y >= this.height) {
+                console.log("cant rotate block", to_be_x < 0, to_be_x >= this.width, to_be_y < 0, to_be_y >= this.width);
+                return false;
+            }
+            if (this.logical_map[to_be_y][to_be_x].state != "blank" && !this.is_part_of_whole({ x: to_be_x, y: to_be_y }, block.list)) {
+
+                console.log("cant rotate block", this.is_part_of_whole({ x: to_be_x, y: to_be_y }, block.list), this.logical_map[to_be_y][to_be_x].state != "blank");
+                console.log(this.logical_map[to_be_y][to_be_x]);
+                return false;
+            }
+
+        }
+
+        return true;
+    }
+
     rotate_left_l(block) {
         if (block.rotation == 0) {
+            if (!this.can_rotate_block(block, this.rotation_vectors.left_l.first)) return;
             for (var i = 0; i < block.list.length; i++) {
                 var rotation_vec = this.rotation_vectors.left_l.first[i];
+
 
                 this.logical_map[block.list[i].y][block.list[i].x].color = "white";
                 this.logical_map[block.list[i].y][block.list[i].x].state = "blank";
@@ -364,6 +429,8 @@ class TetrisWorld {
             block.rotation = 1;
 
         } else if (block.rotation == 1) {
+            if (!this.can_rotate_block(block, this.rotation_vectors.left_l.second)) return;
+
             for (var i = 0; i < block.list.length; i++) {
 
                 var rotation_vec = this.rotation_vectors.left_l.second[i];
@@ -377,6 +444,8 @@ class TetrisWorld {
             }
             block.rotation = 2;
         } else if (block.rotation == 2) {
+            if (!this.can_rotate_block(block, this.rotation_vectors.left_l.third)) return;
+
             for (var i = 0; i < block.list.length; i++) {
 
                 var rotation_vec = this.rotation_vectors.left_l.third[i];
@@ -390,6 +459,8 @@ class TetrisWorld {
             }
             block.rotation = 3;
         } else if (block.rotation == 3) {
+            if (!this.can_rotate_block(block, this.rotation_vectors.left_l.forth)) return;
+
             for (var i = 0; i < block.list.length; i++) {
 
                 var rotation_vec = this.rotation_vectors.left_l.forth[i];
@@ -404,6 +475,140 @@ class TetrisWorld {
             block.rotation = 0;
         }
     }
+
+
+    rotate_right_l(block) {
+        if (block.rotation == 0) {
+            if (!this.can_rotate_block(block, this.rotation_vectors.right_l.first)) return;
+
+            for (var i = 0; i < block.list.length; i++) {
+                var rotation_vec = this.rotation_vectors.right_l.first[i];
+
+                this.logical_map[block.list[i].y][block.list[i].x].color = "white";
+                this.logical_map[block.list[i].y][block.list[i].x].state = "blank";
+
+                block.list[i].x += rotation_vec.x;
+                block.list[i].y += rotation_vec.y;
+            }
+            block.rotation = 1;
+
+        } else if (block.rotation == 1) {
+            if (!this.can_rotate_block(block, this.rotation_vectors.right_l.second)) return;
+
+            for (var i = 0; i < block.list.length; i++) {
+
+                var rotation_vec = this.rotation_vectors.right_l.second[i];
+
+                this.logical_map[block.list[i].y][block.list[i].x].color = "white";
+                this.logical_map[block.list[i].y][block.list[i].x].state = "blank";
+
+                block.list[i].x += rotation_vec.x;
+                block.list[i].y += rotation_vec.y;
+
+            }
+            block.rotation = 2;
+        } else if (block.rotation == 2) {
+            if (!this.can_rotate_block(block, this.rotation_vectors.right_l.third)) return;
+
+            for (var i = 0; i < block.list.length; i++) {
+
+                var rotation_vec = this.rotation_vectors.right_l.third[i];
+
+                this.logical_map[block.list[i].y][block.list[i].x].color = "white";
+                this.logical_map[block.list[i].y][block.list[i].x].state = "blank";
+
+                block.list[i].x += rotation_vec.x;
+                block.list[i].y += rotation_vec.y;
+
+            }
+            block.rotation = 3;
+        } else if (block.rotation == 3) {
+            if (!this.can_rotate_block(block, this.rotation_vectors.right_l.forth)) return;
+
+            for (var i = 0; i < block.list.length; i++) {
+
+                var rotation_vec = this.rotation_vectors.right_l.forth[i];
+
+                this.logical_map[block.list[i].y][block.list[i].x].color = "white";
+                this.logical_map[block.list[i].y][block.list[i].x].state = "blank";
+
+                block.list[i].x += rotation_vec.x;
+                block.list[i].y += rotation_vec.y;
+
+            }
+            block.rotation = 0;
+        }
+
+    }
+
+    rotate_snake(block) {
+        if (block.rotation == 0) {
+            if (!this.can_rotate_block(block, this.rotation_vectors.snake.first)) return;
+
+            for (var i = 0; i < block.list.length; i++) {
+
+                var rotation_vec = this.rotation_vectors.snake.first[i];
+
+                this.logical_map[block.list[i].y][block.list[i].x].color = "white";
+                this.logical_map[block.list[i].y][block.list[i].x].state = "blank";
+
+                block.list[i].x += rotation_vec.x;
+                block.list[i].y += rotation_vec.y;
+
+            }
+            block.rotation = 1;
+        } else if (block.rotation == 1) {
+            if (!this.can_rotate_block(block, this.rotation_vectors.snake.second)) return;
+
+            for (var i = 0; i < block.list.length; i++) {
+
+                var rotation_vec = this.rotation_vectors.snake.first[i];
+
+                this.logical_map[block.list[i].y][block.list[i].x].color = "white";
+                this.logical_map[block.list[i].y][block.list[i].x].state = "blank";
+
+                block.list[i].x += -rotation_vec.x;
+                block.list[i].y += -rotation_vec.y;
+
+            }
+            block.rotation = 0;
+        }
+
+    }
+
+    rotate_left_snake(block) {
+        if (block.rotation == 0) {
+            if (!this.can_rotate_block(block, this.rotation_vectors.left_snake.first)) return;
+
+            for (var i = 0; i < block.list.length; i++) {
+
+                var rotation_vec = this.rotation_vectors.left_snake.first[i];
+
+                this.logical_map[block.list[i].y][block.list[i].x].color = "white";
+                this.logical_map[block.list[i].y][block.list[i].x].state = "blank";
+
+                block.list[i].x += rotation_vec.x;
+                block.list[i].y += rotation_vec.y;
+
+            }
+            block.rotation = 1;
+        } else if (block.rotation == 1) {
+            if (!this.can_rotate_block(block, this.rotation_vectors.left_snake.first.map(function(param) { return { x: -param.x, y: -param.y } }))) return;
+
+            for (var i = 0; i < block.list.length; i++) {
+                var rotation_vec = this.rotation_vectors.left_snake.first[i];
+
+                this.logical_map[block.list[i].y][block.list[i].x].color = "white";
+                this.logical_map[block.list[i].y][block.list[i].x].state = "blank";
+
+                block.list[i].x += -rotation_vec.x;
+                block.list[i].y += -rotation_vec.y;
+
+            }
+            block.rotation = 0;
+        }
+    }
+
 
     rotate_t_shaped(block) {
         console.log(block);
@@ -445,7 +650,7 @@ class TetrisWorld {
                 block.list[i].y += rotation_vec.y;
 
             }
-            block.rotation = 0;
+            block.rotation = 3;
         } else if (block.rotation == 3) {
             for (var i = 0; i < block.list.length; i++) {
 
@@ -476,6 +681,9 @@ class TetrisWorld {
         if (block.name == "line") this.rotate_line(block);
         if (block.name == "t_shaped") this.rotate_t_shaped(block);
         if (block.name == "left_L") this.rotate_left_l(block);
+        if (block.name == "right_L") this.rotate_right_l(block);
+        if (block.name == "snake") this.rotate_snake(block);
+        if (block.name == "left_snake") this.rotate_left_snake(block);
     }
 
 }
