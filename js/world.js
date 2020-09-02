@@ -371,6 +371,8 @@ class TetrisWorld {
             }
             this.place_block_onto_map(falling_object);
         } else {
+            this.place_block_onto_map(falling_object);
+            console.log("element becomes steady");
             for (var part of falling_object) {
                 part.state = "steady";
             }
