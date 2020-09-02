@@ -147,7 +147,6 @@ class TetrisWorld {
         var shapes = ["square", "t_shaped", "snake", "left_snake", "line", "left_L", "right_L", ];
 
         var random_shape = shapes[Math.floor(Math.random() * shapes.length)];
-        random_shape = "left_snake";
 
 
         if (random_shape == 'square') {
