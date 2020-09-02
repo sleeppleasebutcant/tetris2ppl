@@ -322,7 +322,7 @@ class TetrisWorld {
         if (KEYS["ArrowLeft"]) {
             this.move_left();
         }
-        if (KEYS["KeyR"] && Date.now() - this.time_of_last_rotate > 150) {
+        if (KEYS["Space"] && Date.now() - this.time_of_last_rotate > 150) {
             this.time_of_last_rotate = Date.now();
             this.rotate(falling_object_whole);
         }
@@ -331,7 +331,7 @@ class TetrisWorld {
         if (KEYS["ArrowRight"]) {
             this.move_right();
         }
-        if (KEYS["Space"]) {
+        if (KEYS["ArrowDown"]) {
             console.log("space");
             this.game_speed = 50;
         } else {
