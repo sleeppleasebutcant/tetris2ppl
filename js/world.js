@@ -8,6 +8,7 @@ class TetrisWorld {
         this.last_tick = Date.now();
         this.game_speed = 400;
         this.time_of_last_rotate = Date.now();
+        this.time_of_last_rightleft = Date.now();
         this.score = 0;
 
         this.rotation_vectors = {
@@ -160,7 +161,8 @@ class TetrisWorld {
     new_falling_block() {
 
 
-        var colors = ["red", "orange", "blue", "yellow", "pink", "purple"];
+
+        var colors = ["red", "orange", "blue", "rgb(179, 179, 25)", "deeppink", "purple"];
         var random_color = colors[Math.floor(Math.random() * colors.length)];
         var shapes = ["square", "t_shaped", "snake", "left_snake", "line", "left_L", "right_L", ];
 
@@ -342,11 +344,14 @@ class TetrisWorld {
             this.rotate(falling_object_whole);
         }
 
-        if (KEYS["ArrowLeft"]) {
+        if (KEYS["ArrowLeft"] && Date.now() - this.time_of_last_rightleft > 100) {
+            this.time_of_last_rightleft = Date.now();
             this.move_left();
         }
 
-        if (KEYS["ArrowRight"]) {
+        if (KEYS["ArrowRight"] && Date.now() - this.time_of_last_rightleft > 100) {
+            this.time_of_last_rightleft = Date.now();
+
             this.move_right();
         }
         if (KEYS["ArrowDown"]) {
