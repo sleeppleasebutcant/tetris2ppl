@@ -10,5 +10,7 @@ function draw(tetris_world) {
         }
         frame += " | <br>";
     }
+    frame += "<br>";
+    frame += "<span class=\"badge badge-light\"> Score: " + tetris_world.score + "</span>"
     document.getElementById("game_1").innerHTML = frame;
 }

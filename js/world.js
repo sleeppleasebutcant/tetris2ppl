@@ -256,6 +256,7 @@ class TetrisWorld {
 
     }
 
+
     can_move_down(obj) {
 
         for (const part of obj) {
@@ -297,6 +298,14 @@ class TetrisWorld {
         return true;
     }
 
+    is_bottom_line_complete() {
+        for (var el of this.logical_map[this.logical_map.length - 1]) {
+            if (el.state == "blank") return false;
+        }
+        console.log("line complete", this.logical_map[this.logical_map.length - 1]);
+        return true;
+    }
+
     move_left() {
         var falling_object = this.falling_objects[this.falling_objects.length - 1].list;
         if (!this.can_move_left(falling_object)) {
@@ -332,6 +341,17 @@ class TetrisWorld {
     }
 
 
+    handle_line_completion() {
+        var multipiler = 1;
+        while (this.is_bottom_line_complete()) {
+            this.score += 10 * multipiler;
+            multipiler *= 2;
+            this.one_down();
+            console.log("line complete, score", this.score);
+
+        }
+    }
+
     tick() {
 
 
@@ -342,7 +362,9 @@ class TetrisWorld {
         if (KEYS["Space"] && Date.now() - this.time_of_last_rotate > 150) {
             this.time_of_last_rotate = Date.now();
             this.rotate(falling_object_whole);
+
         }
+
 
         if (KEYS["ArrowLeft"] && Date.now() - this.time_of_last_rightleft > 100) {
             this.time_of_last_rightleft = Date.now();
@@ -367,11 +389,13 @@ class TetrisWorld {
             this.last_tick = Date.now();
         }
 
+        this.handle_line_completion();
+
+
         if (this.can_move_down(falling_object)) {
             for (part of falling_object) {
                 this.logical_map[part.y][part.x].state = "blank";
                 this.logical_map[part.y][part.x].color = "white";
-                console.log("moving down", "x:" + part.x, "y:" + part.y)
                 part.y += 1;
             }
             this.place_block_onto_map(falling_object);
@@ -706,6 +730,17 @@ class TetrisWorld {
             block.rotation = 0;
         }
         console.log(block);
+    }
+    one_down() {
+
+        console.log("one downs");
+        console.log(this.logical_map);
+        this.logical_map.pop();
+        console.log(this.logical_map);
+        this.logical_map.unshift([]);
+        for (var j = 0; j < this.width; j++) {
+            this.logical_map[0].push({ color: "white", state: "blank", whole: [], inter: 0.0 });
+        }
     }
 
     rotate(block) {
